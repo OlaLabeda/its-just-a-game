@@ -1,10 +1,10 @@
 from random import randint 
 
 
-class NegativeLivesError(Exception): # dziedziczy po jakims istniejacym wyjatku
-    def __init__(self, lives):
-        super().__init__('Lives cannot be negative')
-        self.lives = lives
+class NegativePowerError(Exception): # dziedziczy po jakims istniejacym wyjatku
+    def __init__(self, power):
+        super().__init__('Power cannot be negative')
+        self.power = power
  
 class NameError(Exception):
     pass
@@ -40,16 +40,16 @@ class Player:
     :param name: player's name
     :type name: str
     
-    :param lives: player's lives, defaults to 1
-    :type name: int
+    :param power: player's power, defaults to 5
+    :type power: int
     
     """
-    def __init__(self, name, lives = 1):
+    def __init__(self, name, power = 5):
         self._name = name
-        lives = int(lives)
-        if lives < 0:
-            raise NegativeLivesError(lives)
-        self._lives = int(lives)
+        power = int(power)
+        if power < 0:
+            raise NegativePowerError(power)
+        self._power = int(power)
     
     
     def name(self):
@@ -62,14 +62,14 @@ class Player:
         self._name = str(new_name).title()
         
     
-    def lives(self):
-        return self._lives
+    def power(self):
+        return self._power
     
     
-    def set_lives(self, new_lives):
-        if new_lives < 0:
-            raise NegativeLivesError(new_lives)
-        self._lives = new_lives      
+    def set_power(self, new_power):
+        if new_power < 0:
+            raise NegativePowerError(new_power)
+        self._power = new_power      
         
          
     def info(self):
@@ -77,11 +77,7 @@ class Player:
         Returns basic description of the player
         
         """
-        if self._lives == 1:
-            lives = 'life'
-        else:
-            lives = 'lives'
-        return f'My name is {self._name}. I have {self._lives} {lives} left'
+        return f'My name is {self._name}. I have {self._power} power left'
      
              
     def __str__(self):

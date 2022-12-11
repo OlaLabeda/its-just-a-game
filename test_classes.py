@@ -1,6 +1,6 @@
 from classes import Player, Enemy, Hydra, DragonHydra, Game
 from classes import (
-        NegativeLivesError,
+        NegativePowerError,
         NameError, NegativeHealthError,
         NegativeDamageError, 
         NotEnoughHeadsError,
@@ -12,25 +12,23 @@ import pytest
 def test_create_player():
     player = Player('Jurek Ogorek')
     assert player.name() == 'Jurek Ogorek'
-    assert player.lives() == 1
+    assert player.power() == 5
     
 
-def test_create_player_with_lives():
+def test_create_player_with_power():
     player = Player('Jurek Ogorek', 4)
     assert player.name() == 'Jurek Ogorek'
-    assert player.lives() == 4
+    assert player.power() == 4
 
          
-def test_create_player_with_negative_lives():
-    with pytest.raises(NegativeLivesError):
+def test_create_player_with_negative_power():
+    with pytest.raises(NegativePowerError):
         player = Player('Jurek Ogorek', -6)
 
 
 def test_introduce():
     player = Player('Jurek Ogorek', 3)
-    assert player.info() == 'My name is Jurek Ogorek. I have 3 lives left'
-    player = Player('Jurek Ogorek', 1) 
-    assert player.info() == 'My name is Jurek Ogorek. I have 1 life left'
+    assert player.info() == 'My name is Jurek Ogorek. I have 3 power left'
     
     
 def test_introduce_as_str():
@@ -58,25 +56,25 @@ def test_set_name_lowercase():
     assert player.name() == 'Karolina Malina'
     
 
-def test_set_lives():
+def test_set_power():
     player = Player('Jurek Ogorek', 1)
-    assert player.lives() == 1
-    player.set_lives(2)
-    assert player.lives() == 2
+    assert player.power() == 1
+    player.set_power(2)
+    assert player.power() == 2
 
 
-def test_set_lives_zero():
+def test_set_power_zero():
     player = Player('Jurek Ogorek', 1)
-    assert player.lives() == 1
-    player.set_lives(0)
-    assert player.lives() == 0
+    assert player.power() == 1
+    player.set_power(0)
+    assert player.power() == 0
     
     
-def test_set_lives_negative():
+def test_set_power_negative():
     player = Player('Jurek Ogorek', 1)
-    assert player.lives() == 1
-    with pytest.raises(NegativeLivesError):
-        player.set_lives(-1)
+    assert player.power() == 1
+    with pytest.raises(NegativePowerError):
+        player.set_power(-1)
     
 
 def test_enemy_create():
