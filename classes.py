@@ -1,5 +1,5 @@
-from random import randint 
-
+from random import randint, choice
+import pytest
 
 class NegativePowerError(Exception): # dziedziczy po jakims istniejacym wyjatku
     def __init__(self, power):
@@ -71,7 +71,20 @@ class Player:
             raise NegativePowerError(new_power)
         self._power = new_power      
         
-         
+        
+    def attack(self, enemies):
+        if self.power() == 0 or not enemies:
+            return (None, 0, False)
+        # choose enemy from enemies
+        enemy = choice(enemies)
+        # calculate damage
+        damage = randint(1, self.power())
+        # apply damage
+        took_hit = enemy.take_damage(damage)
+        self.set_power(self.power() - 1)
+        return (enemy, damage, took_hit)
+        
+    
     def info(self):
         """
         Returns basic description of the player
@@ -151,7 +164,7 @@ class Enemy:
         if damage <= 0:
             raise NegativeDamageError(damage)
         self._health -= min(self._health, damage)
-        
+        return True
     
     def is_alive(self):
         """
@@ -201,8 +214,8 @@ class Hydra(Enemy):
 class DragonHydra(Hydra):
     def take_damage(self, damage):
         if randint(0, 1):
-            super().take_damage(damage)
-            
+           return super().take_damage(damage)
+        return False    
             
 class Game:
     def __init__(self, player, enemies = None):
@@ -210,5 +223,24 @@ class Game:
         self.enemies = enemies if enemies else []
         # niezmiennik - nie hcce ryzykowac ze ktos mi cos rozgrzebie
         self._result = None
-        
+    
+    def play(self, rounds):
+        print('Starting the game')
+        for round in range(1, rounds + 1):
+            print(f'ROUND{round}')
+            target, damage, status = self.player.attack(self.enemies)
+            if target:
+                if status:
+                    print(f'{target.name()} took {damage} points of damage')
+                    if not target.is_alive():
+                        print(f'{target.name()} died.')
+                        self.enemies.remove(target)
+                else:
+                    print(f'{target.name()} escaped damage.')
+        self._result = bool(self.enemies)
+        return self._result
+                    
+                    
+                     
+
         

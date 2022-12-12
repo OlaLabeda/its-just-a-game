@@ -77,6 +77,111 @@ def test_set_power_negative():
         player.set_power(-1)
     
 
+def test_attack():
+    player = Player('Jurek Ogorek')
+    assert player.power() == 5
+    orc = Enemy('orc', 10)
+    assert orc.health() == 10
+    enemies = [orc]
+    target, damage, status = player.attack(enemies)
+    assert target == orc
+    assert status is True
+    assert player.power() == 4
+    assert orc.health() < 10
+    assert orc.health() == 10 - damage
+    
+    
+def test_attack_choice():
+    player = Player('Jurek Ogorek')
+    orc1 = Enemy('orc1', 10)
+    orc2 = Enemy('orc2', 20)
+    base_health = {orc1: 10, orc2: 20}
+    enemies = [orc1, orc2]
+    target, damage, status = player.attack(enemies)
+    assert status is True
+    assert player.power() == 4
+    assert target in enemies
+    assert target.health() < base_health[target]
+    assert target.health() == base_health[target] - damage
+    # assert orc1.health() < 10 or orc2.health() < 20
+        
+        
+def test_attack_choose_enemy(monkeypatch):
+    player = Player('Jurek Ogorek')
+    orc1 = Enemy('orc1', 10)
+    orc2 = Enemy('orc2', 20)
+    enemies = [orc1, orc2]  
+
+    def get_orc2(orcs):
+        return orc2
+    monkeypatch.setattr('classes.choice', get_orc2)
+    target, damage, status = player.attack(enemies)    
+    assert status is True
+    assert target == orc2
+    assert player.power() == 4
+    assert orc1.health() == 10 and orc2.health() == 20 - damage 
+      
+      
+def test_attack_no_power():
+    player = Player('Jurek Ogorek', 0)
+    assert player.power() == 0
+    orc = Enemy('orc', 10)
+    assert orc.health() == 10
+    enemies = [orc]
+    target, damage, status = player.attack(enemies)
+    assert status is False
+    assert damage == 0
+    assert target is None
+    assert player.power() == 0
+    assert orc.health() == 10
+    
+    
+def test_attack_power_eq_1():
+    player = Player('Jurek Ogorek', 1)
+    assert player.power() == 1
+    orc = Enemy('orc', 10)
+    assert orc.health() == 10
+    enemies = [orc]
+    target, damage, status = player.attack(enemies)
+    player.attack(enemies)
+    assert damage == 1
+    assert target == orc
+    assert status is True
+    assert player.power() == 0
+    assert orc.health() == 9
+     
+def test_attack_power(monkeypatch):
+    player = Player('Jurek Ogorek')
+    assert player.power() == 5
+    orc = Enemy('orc', 10)
+    assert orc.health() == 10
+    enemies = [orc]
+
+    def damage_two(t, f):
+        return 2
+    monkeypatch.setattr('classes.randint', damage_two)
+    target, damage, status = player.attack(enemies)
+    assert target == orc
+    assert damage ==2
+    assert status is True
+    assert player.power() == 4
+    assert orc.health() == 8
+
+
+def test_attack_set_power():
+    player = Player('Jurek Ogorek')
+    assert player.power() == 5
+    player.set_power(10)
+    assert player.power() == 10
+    
+
+def test_attack_set_power_negative():
+    player = Player('Jurek Ogorek')
+    assert player.power() == 5
+    player.set_power(10)
+    assert player.power() == 10
+         
+     
 def test_enemy_create():
     enemy = Enemy('orc', 50)
     assert enemy.name() == 'orc'
@@ -121,7 +226,7 @@ def test_enemy_description():
 def test_enemy_take_damage():
     enemy = Enemy('orc', 50)
     assert enemy.health() == 50
-    enemy.take_damage(10)
+    assert enemy.take_damage(10) is True
     assert enemy.health() == 40
     
 
@@ -139,7 +244,7 @@ def test_take_damage_drops_below_zero():
     enemy = Enemy('orc', 10)
     # skoro uzywam teg
     assert enemy.health() == 10
-    enemy.take_damage(30)
+    assert enemy.take_damage(30) is True
     assert enemy.health() == 0
 
 
@@ -224,7 +329,7 @@ def test_dragonhydra_take_damage_hit(monkeypatch):
     monkeypatch.setattr('classes.randint', returnOne)
     enemy = DragonHydra('dragon', 40, 3)
     assert enemy.health() == 40
-    enemy.take_damage(10)
+    assert enemy.take_damage(10) is True
     assert enemy.health() == 30
     
     
@@ -234,7 +339,7 @@ def test_dragonhydra_take_damage_nohit(monkeypatch):
     monkeypatch.setattr('classes.randint', returnZero)
     enemy = DragonHydra('dragon', 40, 3)
     assert enemy.health() == 40
-    enemy.take_damage(10)
+    assert enemy.take_damage(10) is False
     assert enemy.health() == 40
     
     
@@ -253,3 +358,5 @@ def test_game_create_default_enemies():
     game = Game(player)
     assert game.player == player
     assert game.enemies == []
+    
+    
