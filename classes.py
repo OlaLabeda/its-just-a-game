@@ -230,7 +230,7 @@ class Game:
             print(f'ROUND{round}')
             target, damage, status = self.player.attack(self.enemies)
             if target:
-                if status:
+0,                if status:
                     print(f'{target.name()} took {damage} points of damage')
                     if not target.is_alive():
                         print(f'{target.name()} died.')
